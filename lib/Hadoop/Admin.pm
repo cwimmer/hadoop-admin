@@ -49,7 +49,7 @@ use LWP::UserAgent;
 use JSON -support_by_pp;
 
 use version;
-our $VERSION='0.1';
+our $VERSION='0.2_01';
 
 
 =pod

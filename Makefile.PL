@@ -10,9 +10,11 @@ WriteMakefile(
     PREREQ_PM         => {
 	"LWP::UserAgent"       => 0,
 	"JSON"                 => 0,
-	"XML::LibXML"          => 0,
 	"TAP::Harness::JUnit"  => 0,
 	"LWP::Protocol::https" => 0,
 	"LWP::Protocol::socks" => 0,
+    },
+    BUILD_REQUIRES => {
+	"ExtUtils::MakeMaker" => 6.62,
     },
     );

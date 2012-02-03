@@ -1,0 +1,5 @@
+0.2
+  - Updated build requirements.  Some CPAN tests were failing.
+  - Removed some unused runtime dependencies.
+0.1
+  - Initial revision
