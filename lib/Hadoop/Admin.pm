@@ -8,10 +8,6 @@
 
 Hadoop::Admin - Module for administration of Hadoop clusters
 
-=head1 REVISION
-
-$Id$
-
 =head1 SYNOPSIS
 
     use Hadoop::Admin; 
@@ -19,7 +15,6 @@ $Id$
     my $cluster=Hadoop::Admin->new({
       'namenode'          => 'namenode.host.name',
       'jobtracker'        => 'jobtracker.host.name',
-      'secondarynamenode' => 'secondarynamenode.host.name',
     });
 
     print $cluster->datanode_live_list();
@@ -27,27 +22,12 @@ $Id$
 
 =head1 DESCRIPTION
 
-=head1 EXPORTABLE VARIABLES
+This module connects to Hadoop servers using http.  The JMX Proxy
+Servlet is queried for specific mbeans.
 
-If there is no special marking for the variable, it is
-exported when you call `use'. The rags next to variables mean:
-
-    [ok]    = variable is exported via list EXPORT_OK
-    [tag]   = variable is exported via :TAG
-
-=head2 $ABC_REGEXP
-
-<description>
-
-=head2 %ABC_HASH [ok]
-
-<description>
-
-=head2 $debug [ok]
-
-Integer. If positive, activate debug with LEVEL.
-
-<description>
+This module requires Hadoop the changes in
+https://issues.apache.org/jira/browse/HADOOP-7144.  They are available
+in versions 0.20.204.0, 0.23.0 or later.
 
 =head1 INTERFACE FUNCTIONS
 
@@ -71,6 +51,35 @@ use JSON -support_by_pp;
 use version;
 our $VERSION='0.1';
 
+
+=pod
+
+=head2 new ()
+
+=over 4
+
+=item Description
+
+Create a new instance of the Hadoop::Admin class.  
+
+The method requires a hash containing at minimum the namenode's, and
+the jobtracker's hostnames.  Optionally, you may provide a socksproxy
+for the http connection.
+
+Creation of this object will cause an immediate querry to both the
+NameNode and JobTracker.
+
+=item namenode => <hostname>
+
+=item jobtracker => <hostname>
+
+=item socksproxy => <hostname>
+
+=item Returns newly created object.
+
+=back
+
+=cut
 sub new(){
 
     Carp::croak("Options should be key/value pairs, not hash reference") 
@@ -136,11 +145,38 @@ sub new(){
     return $self;
 }
 
+
+=pod
+
+=head2 get_namenode ()
+
+=over 4
+
+=item Description
+
+Returns the JobTracker from instantiation
+
+=back
+
+=cut
 sub get_namenode(){
     my $self=shift;
     return $self->{'namenode'};
 }
 
+=pod
+
+=head2 get_namenode ()
+
+=over 4
+
+=item Description
+
+Returns the JobTracker from instantiation
+
+=back
+
+=cut
 sub get_jobtracker(){
     my $self=shift;
     return $self->{'jobtracker'};
@@ -151,27 +187,109 @@ sub get_secondarynamenode(){
     return $self->{'secondarynamenode'};
 }
 
+=pod
+
+=head2 get_namenode ()
+
+=over 4
+
+=item Description
+
+Returns the Socks Proxy from instantiation
+
+=back
+
+=cut
 sub get_socksproxy(){
     my $self=shift;
     return $self->{'socksproxy'};
 }
 
+
+=pod
+
+=head2 datanode_live_list ()
+
+=over 4
+
+=item Description
+
+Returns a list of the current live DataNodes.
+
+=item Return values
+
+Array containing hostnames.
+
+=back
+
+=cut
 sub datanode_live_list(){
     my $self=shift;
     return keys %{$self->{'NameNodeInfo_LiveNodes'}};
 }
 
+=pod
+
+=head2 datanode_dead_list ()
+
+=over 4
+
+=item Description
+
+Returns a list of the current dead DataNodes.
+
+=item Return values
+
+Array containing hostnames.
+
+=back
+
+=cut
 sub datanode_dead_list(){
     my $self=shift;
     return keys %{$self->{'NameNodeInfo_DeadNodes'}};
 }
 
+=pod
+
+=head2 datanode_decom_list ()
+
+=over 4
+
+=item Description
+
+Returns a list of the currently decommissioning DataNodes.
+
+=item Return values
+
+Array containing hostnames.
+
+=back
+
+=cut
 sub datanode_decom_list(){
     my $self=shift;
     return keys %{$self->{'NameNodeInfo_DecomNodes'}};
 }
 
 
+=pod
+
+=head2 tasktracker_live_list ()
+
+=over 4
+
+=item Description
+
+Returns a list of the current live TaskTrackers.
+
+=item Return values
+
+Array containing hostnames.
+
+=back
+
+=cut
 sub tasktracker_live_list(){
     my $self=shift;
     my @returnValue=();
@@ -182,6 +300,23 @@ sub tasktracker_live_list(){
     return @returnValue;
 }
 
+=pod
+
+=head2 tasktracker_live_list ()
+
+=over 4
+
+=item Description
+
+Returns a list of the current blacklisted TaskTrackers.
+
+=item Return values
+
+Array containing hostnames.
+
+=back
+
+=cut
 sub tasktracker_blacklist_list(){
     my $self=shift;
     my @returnValue=();
@@ -191,6 +326,23 @@ sub tasktracker_blacklist_list(){
     return @returnValue;
 }
 
+=pod
+
+=head2 tasktracker_live_list ()
+
+=over 4
+
+=item Description
+
+Returns a list of the current graylisted TaskTrackers.
+
+=item Return values
+
+Array containing hostnames.
+
+=back
+
+=cut
 sub tasktracker_graylist_list(){
     my $self=shift;
     my @returnValue=();
@@ -270,3 +422,38 @@ sub parse_jt_jmx(){
 }
 
 1;
+# ****************************************************************************
+#
+#   POD FOOTER
+#
+# ****************************************************************************
+
+=pod
+
+=for html
+</BLOCKQUOTE>
+
+=head1 KNOWN BUGS
+
+None known at this time.  Please log issues at: 
+
+https://github.com/cwimmer/hadoop-admin/issues
+
+=head1 AVAILABILITY
+
+Source code is available on GitHub:
+
+https://github.com/cwimmer/hadoop-admin
+
+Module available on CPAN as Hadoop::Admin:
+
+http://search.cpan.org/~cwimmer/
+
+=head1 AUTHOR
+
+Copyright (C) 2012 Charles Wimmer.
+This program is free software; you can redistribute and/or modify program
+under the same terms as Perl itself or in terms of Gnu General Public
+license v2 or later.
+
+=cut
