@@ -1,5 +1,6 @@
 0.2
-  - Updated build requirements.  Some CPAN tests were failing.
+  - Updated build and configure requirements.  Some CPAN tests were failing.
   - Removed some unused runtime dependencies.
+  - Changed version number to eval.
 0.1
   - Initial revision

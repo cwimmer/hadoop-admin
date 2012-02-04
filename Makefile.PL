@@ -17,4 +17,7 @@ WriteMakefile(
     BUILD_REQUIRES => {
 	"ExtUtils::MakeMaker" => 6.62,
     },
+    CONFIGURE_REQUIRES => {
+	"ExtUtils::MakeMaker" => 6.62,
+    },
     );
