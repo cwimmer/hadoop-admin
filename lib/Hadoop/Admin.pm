@@ -49,7 +49,7 @@ use LWP::UserAgent;
 use JSON -support_by_pp;
 
 use version;
-our $VERSION='0.2_02';
+our $VERSION='0.2_03';
 $VERSION = eval $VERSION;
 
 

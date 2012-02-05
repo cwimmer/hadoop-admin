@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME => 'Hadoop::Admin',
     ABSTRACT_FROM => 'lib/Hadoop/Admin.pm',
-    AUTHOR => [ 'Charles Wimmer', 'charles@wimmer.net' ],
+    AUTHOR => 'Charles A. Wimmer (charles@wimmer.net)',
     VERSION_FROM => 'lib/Hadoop/Admin.pm',
     PREREQ_PM         => {
 	"LWP::UserAgent"       => 0,
@@ -15,9 +15,9 @@ WriteMakefile(
 	"LWP::Protocol::socks" => 0,
     },
     BUILD_REQUIRES => {
-	"ExtUtils::MakeMaker" => 6.62,
+	"ExtUtils::MakeMaker" => 6.55,
     },
     CONFIGURE_REQUIRES => {
-	"ExtUtils::MakeMaker" => 6.62,
+	"ExtUtils::MakeMaker" => 6.55,
     },
     );
