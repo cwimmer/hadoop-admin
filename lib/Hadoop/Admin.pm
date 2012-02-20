@@ -42,16 +42,10 @@ in versions 0.20.204.0, 0.23.0 or later.
 
 package Hadoop::Admin;
 
-
 use strict;
 use warnings;
 use LWP::UserAgent;
 use JSON -support_by_pp;
-
-use version;
-our $VERSION='0.2_03';
-$VERSION = eval $VERSION;
-
 
 =pod
 
