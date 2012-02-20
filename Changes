@@ -1,3 +1,5 @@
+{{$NEXT}}
+  - Converted from ExtUtils::MakeMaker to Dist::Zilla
 0.2
   - Updated build and configure requirements.  Some CPAN tests were failing.
   - Removed some unused runtime dependencies.
