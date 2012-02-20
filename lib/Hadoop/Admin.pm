@@ -397,7 +397,7 @@ sub gather_jt_jmx($$){
     my $jmx_url= "http://".$self->{'jobtracker'}.":50030/jmx?qry=$qry";
     my $response = $self->{'ua'}->get($jmx_url);
     if (! $response->is_success) {
-	print "Can't get JMX data from Namenode: $@";
+	print "Can't get JMX data from JobTracker: $@";
 	exit(1);
     }
     $self->parse_jt_jmx($response->decoded_content);
