@@ -369,7 +369,7 @@ sub tasktracker_blacklist_list{
 
 =pod
 
-=head2 tasktracker_live_list ()
+=head2 tasktracker_gray_list ()
 
 =over 4
 
@@ -559,3 +559,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
+
+=begin Pod::Coverage
+
+gather_jt_jmx
+gather_nn_jmx
+gather_rm_jmx
+get_jobtracker
+get_secondarynamenode
+get_socksproxy
+parse_jt_jmx
+parse_nn_jmx
+parse_rm_jmx
+
+=end Pod::Coverage
