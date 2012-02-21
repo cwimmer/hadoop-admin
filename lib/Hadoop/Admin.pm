@@ -369,7 +369,7 @@ sub tasktracker_blacklist_list{
 
 =pod
 
-=head2 tasktracker_gray_list ()
+=head2 tasktracker_graylist_list ()
 
 =over 4
 
