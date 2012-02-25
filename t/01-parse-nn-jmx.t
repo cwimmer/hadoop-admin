@@ -1,3 +1,5 @@
+# -*- perl -*-
+
 use strict;
 use warnings;
 use Test::More;
@@ -23,5 +25,4 @@ $ha=new Hadoop::Admin(%attributes);
 
 @dn_live_list=$ha->datanode_live_list();
 is($#dn_live_list, 317, "Parse Live List");
-
 done_testing();
