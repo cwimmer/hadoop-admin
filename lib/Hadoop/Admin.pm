@@ -9,35 +9,73 @@ has 'namenode' => (
     is  => 'ro',
     isa => 'Str',
     reader => 'get_namenode',
+    predicate => 'has_namenode',
+    );
+
+has 'namenode_port' => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => '50070',
+    reader  => 'get_namenode_port',
+    predicate => 'has_namenode_port',
     );
 
 has 'jobtracker' => (
     is  => 'ro',
     isa => 'Str',
     reader => 'get_jobtracker',
+    predicate => 'has_jobtracker',
+    );
+
+has 'jobtracker_port' => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => '50030',
+    reader  => 'get_jobtracker_port',
+    predicate => 'has_jobtracker_port',
     );
 
 has 'secondarynamenode' => (
     is  => 'ro',
     isa => 'Str',
     reader => 'get_secondarynamenode',
+    predicate => 'has_secondarynamenode',
     );
 
 has 'resourcemanager' => (
     is  => 'ro',
     isa => 'Str',
     reader => 'get_resourcemanager',
+    predicate => 'has_resourcemanager',
+    );
+
+has 'resourcemanager_port' => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => '8088',
+    reader  => 'get_resourcemanager_port',
+    predicate => 'has_resourcemanager_port',
     );
 
 has 'socksproxy' => (
     is  => 'ro',
     isa => 'Str',
     reader => 'get_socksproxy',
+    predicate => 'has_socksproxy',
+    );
+
+has 'socksproxy_port' => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => '1080',
+    reader  => 'get_socksproxy_port',
+    predicate => 'has_socksproxy_port',
     );
 
 has 'ua' => (
     is  => 'rw',
     isa => 'Object',
+    predicate => 'has_ua',
     );
 
 has '_test_namenodeinfo' => (
@@ -118,6 +156,10 @@ provided to the constructor.
 sub BUILD{
 
     my $self=shift;
+
+    if ( $self->has_resourcemanager && $self->has_jobtracker ){
+	die "Can't have both ResourceManager and JobTracker\n";
+    }
 
     $self->ua(new LWP::UserAgent());
     if ( defined $self->get_socksproxy ){
@@ -352,7 +394,7 @@ sub gather_nn_jmx{
     if ($bean eq 'NameNodeInfo'){
 	$qry='Hadoop%3Aservice%3DNameNode%2Cname%3DNameNodeInfo';
     }
-    my $jmx_url= "http://".$self->{'namenode'}.":50070/jmx?qry=$qry";
+    my $jmx_url= "http://".$self->get_namenode.":".$self->get_namenode_port."/jmx?qry=$qry";
     my $response = $self->{'ua'}->get($jmx_url);
     if (! $response->is_success) {
 	print "Can't get JMX data from Namenode: $@";
@@ -386,7 +428,7 @@ sub gather_jt_jmx{
     if ($bean eq "JobTrackerInfo"){
 	$qry='Hadoop%3Aservice%3DJobTracker%2Cname%3DJobTrackerInfo';
     }
-    my $jmx_url= "http://".$self->{'jobtracker'}.":50030/jmx?qry=$qry";
+    my $jmx_url= "http://".$self->get_jobtracker.":".$self->get_jobtracker_port."/jmx?qry=$qry";
     my $response = $self->{'ua'}->get($jmx_url);
     if (! $response->is_success) {
 	print "Can't get JMX data from JobTracker: $@";
@@ -420,7 +462,7 @@ sub gather_rm_jmx{
     if ($bean eq "RMNMInfo"){
 	$qry='Hadoop%3Aservice%3DResourceManager%2Cname%3DRMNMInfo';
     }
-    my $jmx_url= "http://".$self->{'resourcemanager'}.":8088/jmx?qry=$qry";
+    my $jmx_url= "http://".$self->get_resourcemanager.":".$self->get_resourcemanager_port."/jmx?qry=$qry";
     my $response = $self->{'ua'}->get($jmx_url);
     if (! $response->is_success) {
 	print "Can't get JMX data from ResourceManager: $@";
