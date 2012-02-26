@@ -1,3 +1,5 @@
+# -*- perl -*-
+
 use strict;
 use warnings;
 use Test::More;
@@ -12,4 +14,5 @@ my $ha=new Hadoop::Admin(%attributes);
 
 my @tt_live_list=$ha->tasktracker_live_list();
 is($#tt_live_list, 450, "Parse Live List");
+
 done_testing();
