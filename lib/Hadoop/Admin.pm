@@ -142,13 +142,19 @@ provided to the constructor.
 
 =item namenode => <hostname>
 
+=item namenode_port => <port number>
+
 =item jobtracker => <hostname>
+
+=item jobtracker_port => <port number>
 
 =item resourcemanager => <hostname>
 
+=item resourcemanager_port => <port number>
+
 =item socksproxy => <hostname>
 
-=item Returns newly created object.
+=item socksproxy_port => <port number>
 
 =back
 
@@ -264,7 +270,7 @@ sub datanode_dead_list{
 =head2 datanode_decom_list ()
 
 =over 4
-
+v
 =item Description
 
 Returns a list of the currently decommissioning DataNodes.
