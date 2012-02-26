@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.4      
   - Added tests for 0.23.1 cluster and Resource Manager
   - Fixed warnings from Perl::Critic
   - Added support for ResourceManager
