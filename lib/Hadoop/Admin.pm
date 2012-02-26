@@ -270,7 +270,7 @@ sub datanode_dead_list{
 =head2 datanode_decom_list ()
 
 =over 4
-v
+
 =item Description
 
 Returns a list of the currently decommissioning DataNodes.
