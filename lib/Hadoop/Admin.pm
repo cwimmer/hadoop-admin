@@ -1,12 +1,61 @@
-# ****************************************************************************
-#
-#   POD HEADER
-#
-# ****************************************************************************
+use strict;
+package Hadoop::Admin;
+use warnings;
+use Moose;
+use LWP::UserAgent;
+use JSON -support_by_pp;
 
-=head1 NAME
+has 'namenode' => (
+    is  => 'ro',
+    isa => 'Str',
+    reader => 'get_namenode',
+    );
 
-Hadoop::Admin - Module for administration of Hadoop clusters
+has 'jobtracker' => (
+    is  => 'ro',
+    isa => 'Str',
+    reader => 'get_jobtracker',
+    );
+
+has 'secondarynamenode' => (
+    is  => 'ro',
+    isa => 'Str',
+    reader => 'get_secondarynamenode',
+    );
+
+has 'resourcemanager' => (
+    is  => 'ro',
+    isa => 'Str',
+    reader => 'get_resourcemanager',
+    );
+
+has 'socksproxy' => (
+    is  => 'ro',
+    isa => 'Str',
+    reader => 'get_socksproxy',
+    );
+
+has 'ua' => (
+    is  => 'rw',
+    isa => 'Object',
+    );
+
+has '_test_namenodeinfo' => (
+    is  => 'ro',
+    isa => 'Str',
+    );
+
+has '_test_jobtrackerinfo' => (
+    is  => 'ro',
+    isa => 'Str',
+    );
+
+has '_test_resourcemanagerinfo' => (
+    is  => 'ro',
+    isa => 'Str',
+    );
+
+# ABSTRACT: Module for administration of Hadoop clusters
 
 =head1 SYNOPSIS
 
@@ -31,21 +80,7 @@ in versions 0.20.204.0, 0.23.0 or later.
 
 =head1 INTERFACE FUNCTIONS
 
-=for comment After this the Puclic interface functions are introduced
-=for comment you close the blockquote by inserting POD footer
-
-=for html
-<BLOCKQUOTE>
-
 =cut
-
-use strict;
-package Hadoop::Admin;
-
-
-use warnings;
-use LWP::UserAgent;
-use JSON -support_by_pp;
 
 =pod
 
@@ -57,16 +92,21 @@ use JSON -support_by_pp;
 
 Create a new instance of the Hadoop::Admin class.  
 
-The method requires a hash containing at minimum the namenode's, and
-the jobtracker's hostnames.  Optionally, you may provide a socksproxy
-for the http connection.
+The method requires a hash containing at minimum one of the
+namenode's, the resourcemanager's, and the jobtracker's hostnames.
+Optionally, you may provide a socksproxy for the http connection.  Use
+of both a jobtracker and resourcemanger is prohibited.  It is not a
+valid cluster configuration to have both a jobtracker and a
+resourcemanager.
 
-Creation of this object will cause an immediate querry to both the
-NameNode and JobTracker.
+Creation of this object will cause an immediate querry to servers
+provided to the constructor.
 
 =item namenode => <hostname>
 
 =item jobtracker => <hostname>
+
+=item resourcemanager => <hostname>
 
 =item socksproxy => <hostname>
 
@@ -75,151 +115,63 @@ NameNode and JobTracker.
 =back
 
 =cut
-sub new{
+sub BUILD{
 
-    Carp::croak("Options should be key/value pairs, not hash reference") 
-        if ref($_[1]) eq 'HASH'; 
+    my $self=shift;
 
-    my($class, %cnf) = @_;
-
-    my $self={
-	conf=>{%cnf},
-    };
-
-    if ( exists $self->{'conf'}->{'namenode'} ){
-	$self->{'namenode'}=$self->{'conf'}->{'namenode'};
+    $self->ua(new LWP::UserAgent());
+    if ( defined $self->get_socksproxy ){
+	$self->ua->proxy([qw(http https)] => 'socks://'.$self->get_socksproxy.':1080');
     }
-    if ( exists $self->{'conf'}->{'jobtracker'} ){
-	$self->{'jobtracker'}=$self->{'conf'}->{'jobtracker'};
-    }
-    if ( exists $self->{'conf'}->{'secondarynamenode'} ){
-	$self->{'secondarynamenode'}=$self->{'conf'}->{'secondarynamenode'};
-    }
-    if ( exists $self->{'conf'}->{'resourcemanager'} ){
-	$self->{'resourcemanager'}=$self->{'conf'}->{'resourcemanager'};
-    }
-    if ( exists $self->{'conf'}->{'socksproxy'} ){
-	$self->{'socksproxy'}=$self->{'conf'}->{'socksproxy'};
-    }
-
-    $self->{'ua'} = new LWP::UserAgent();
-    if ( exists $self->{'socksproxy'} ){
-	$self->{'ua'}->proxy([qw(http https)] => 'socks://'.$self->{'socksproxy'}.':1080');
-    }
-
-    bless($self,$class);
-
     ## Hooks for testing during builds.  Doesn't connect to a real cluster.
-    if ( exists $self->{'conf'}->{'_test_namenodeinfo'} ){
+    if ( defined $self->_test_namenodeinfo ){
 	my $test_nn_string;
 	{
 	    local $/=undef;
-	    open (my $fh, '<', $self->{'conf'}->{'_test_namenodeinfo'}) or die "Couldn't open file: $!";
+	    open (my $fh, '<', $self->_test_namenodeinfo) or die "Couldn't open file: $!";
 	    $test_nn_string = <$fh>;
 	    close $fh;
 	}
 	$self->parse_nn_jmx($test_nn_string);
     }else{
-	if ( exists $self->{'namenode'} ){
+	if ( defined $self->get_namenode ){
 	    $self->gather_nn_jmx('NameNodeInfo');
 	}
     }
-    
     ## Hooks for testing during builds.  Doesn't connect to a real cluster.
-    if ( exists $self->{'conf'}->{'_test_jobtrackerinfo'} ){
+    if ( defined $self->_test_jobtrackerinfo ){
 	my $test_jt_string;
 	{
 	    local $/=undef;
-	    open(my $fh, '<', $self->{'conf'}->{'_test_jobtrackerinfo'}) or die "Couldn't open file: $!";
+	    open(my $fh, '<', $self->_test_jobtrackerinfo) or die "Couldn't open file: $!";
 	    $test_jt_string = <$fh>;
 	    close $fh;
 	}
 	$self->parse_jt_jmx($test_jt_string);
     }else{
-	if ( exists $self->{'jobtracker'} ){
+	if ( defined $self->get_jobtracker ){
 	    $self->gather_jt_jmx('JobTrackerInfo');
 	}
     }
     
     ## Hooks for testing during builds.  Doesn't connect to a real cluster.
-    if ( exists $self->{'conf'}->{'_test_resourcemanagerinfo'} ){
+    if ( defined $self->_test_resourcemanagerinfo ){
 	my $test_rm_string;
 	{
 	    local $/=undef;
-	    open(my $fh, '<', $self->{'conf'}->{'_test_resourcemanagerinfo'}) or die "Couldn't open file: $!";
+	    open(my $fh, '<', $self->_test_resourcemanagerinfo) or die "Couldn't open file: $!";
 	    $test_rm_string = <$fh>;
 	    close $fh;
 	}
 	$self->parse_rm_jmx($test_rm_string);
     }else{
-	if ( exists $self->{'resourcemanager'} ){
+	if ( defined $self->get_resourcemanager ){
 	    $self->gather_rm_jmx('RMNMInfo');
 	}
     }
     
     return $self;
 }
-
-
-=pod
-
-=head2 get_namenode ()
-
-=over 4
-
-=item Description
-
-Returns the JobTracker from instantiation
-
-=back
-
-=cut
-sub get_namenode{
-    my $self=shift;
-    return $self->{'namenode'};
-}
-
-=pod
-
-=head2 get_namenode ()
-
-=over 4
-
-=item Description
-
-Returns the JobTracker from instantiation
-
-=back
-
-=cut
-sub get_jobtracker{
-    my $self=shift;
-    return $self->{'jobtracker'};
-}
-
-sub get_secondarynamenode{
-    my $self=shift;
-    return $self->{'secondarynamenode'};
-}
-
-=pod
-
-=head2 get_namenode ()
-
-=over 4
-
-=item Description
-
-Returns the Socks Proxy from instantiation
-
-=back
-
-=cut
-sub get_socksproxy{
-    my $self=shift;
-    return $self->{'socksproxy'};
-}
-
 
 =pod
 
@@ -494,17 +446,6 @@ sub parse_rm_jmx{
 }
 
 1;
-# ****************************************************************************
-#
-#   POD FOOTER
-#
-# ****************************************************************************
-
-=pod
-
-=for html
-</BLOCKQUOTE>
-
 =head1 KNOWN BUGS
 
 None known at this time.  Please log issues at: 
@@ -521,43 +462,6 @@ Module available on CPAN as Hadoop::Admin:
 
 http://search.cpan.org/~cwimmer/
 
-=head1 AUTHOR
-
-This software is Copyright (c) 2012 by Charles A. Wimmer.
-
-This is free software, licensed under:
-
-  The (three-clause) BSD License
-
-The BSD License
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-  * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-
-  * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution. 
-
-  * Neither the name of Charles A. Wimmer nor the names of its
-    contributors may be used to endorse or promote products derived from
-    this software without specific prior written permission. 
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 =cut
 
 =begin Pod::Coverage
@@ -565,11 +469,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 gather_jt_jmx
 gather_nn_jmx
 gather_rm_jmx
-get_jobtracker
-get_secondarynamenode
-get_socksproxy
 parse_jt_jmx
 parse_nn_jmx
 parse_rm_jmx
+BUILD
 
 =end Pod::Coverage
