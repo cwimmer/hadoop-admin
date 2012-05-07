@@ -4,6 +4,7 @@ use warnings;
 use Moose;
 use LWP::UserAgent;
 use JSON -support_by_pp;
+use Try::Tiny;
 
 has 'namenode' => (
     is  => 'ro',
@@ -487,7 +488,11 @@ sub parse_rm_jmx{
 	    $self->{"RMNMInfo_$var"}=$bean->{$var};
 	}
 	if ($bean->{name} eq "Hadoop:service=ResourceManager,name=RMNMInfo"){
-	    $self->{'RMNMInfo_LiveNodeManagers'}=$json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->pretty->decode($bean->{LiveNodeManagers});
+	    try {
+		$self->{'RMNMInfo_LiveNodeManagers'}=$json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->pretty->decode($bean->{LiveNodeManagers});
+	    } catch {
+		$self->{'RMNMInfo_LiveNodeManagers'}=();
+	    };
 	}
 	
     }

@@ -1,5 +1,5 @@
 {{$NEXT}}
-
+  - Caught an error thrown by the JSON parser when the ResourceManager hit an error.
 0.4      
   - Added tests for 0.23.1 cluster and Resource Manager
   - Fixed warnings from Perl::Critic

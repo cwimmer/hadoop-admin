@@ -1,0 +1,10 @@
+{
+
+    "beans": [
+        {
+            "name": "Hadoop:service=ResourceManager,name=RMNMInfo",
+            "modelerType": "org.apache.hadoop.yarn.server.resourcemanager.RMNMInfo"
+        }
+    ]
+
+}
