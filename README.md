@@ -1,7 +1,3 @@
-# NAME
-
-Hadoop::Admin - Module for administration of Hadoop clusters
-
 # SYNOPSIS
 
     use Hadoop::Admin; 
@@ -12,8 +8,6 @@ Hadoop::Admin - Module for administration of Hadoop clusters
     });
 
     print $cluster->datanode_live_list();
-
-
 
 # DESCRIPTION
 
@@ -30,107 +24,96 @@ in versions 0.20.204.0, 0.23.0 or later.
 
 - Description
 
-Create a new instance of the Hadoop::Admin class.  
+    Create a new instance of the Hadoop::Admin class.  
 
-The method requires a hash containing at minimum the namenode's, and
-the jobtracker's hostnames.  Optionally, you may provide a socksproxy
-for the http connection.
+    The method requires a hash containing at minimum one of the
+    namenode's, the resourcemanager's, and the jobtracker's hostnames.
+    Optionally, you may provide a socksproxy for the http connection.  Use
+    of both a jobtracker and resourcemanger is prohibited.  It is not a
+    valid cluster configuration to have both a jobtracker and a
+    resourcemanager.
 
-Creation of this object will cause an immediate querry to both the
-NameNode and JobTracker.
+    Creation of this object will cause an immediate querry to servers
+    provided to the constructor.
 
 - namenode => <hostname>
+- namenode\_port => <port number>
 - jobtracker => <hostname>
+- jobtracker\_port => <port number>
+- resourcemanager => <hostname>
+- resourcemanager\_port => <port number>
 - socksproxy => <hostname>
-- Returns newly created object.
+- socksproxy\_port => <port number>
 
-## get_namenode ()
-
-- Description
-
-Returns the JobTracker from instantiation
-
-## get_namenode ()
+## datanode\_live\_list ()
 
 - Description
 
-Returns the JobTracker from instantiation
-
-## get_namenode ()
-
-- Description
-
-Returns the Socks Proxy from instantiation
-
-## datanode_live_list ()
-
-- Description
-
-Returns a list of the current live DataNodes.
+    Returns a list of the current live DataNodes.
 
 - Return values
 
-Array containing hostnames.
+    Array containing hostnames.
 
-## datanode_dead_list ()
-
-- Description
-
-Returns a list of the current dead DataNodes.
-
-- Return values
-
-Array containing hostnames.
-
-## datanode_decom_list ()
+## datanode\_dead\_list ()
 
 - Description
 
-Returns a list of the currently decommissioning DataNodes.
+    Returns a list of the current dead DataNodes.
 
 - Return values
 
-Array containing hostnames.
+    Array containing hostnames.
 
-## nodemanager_live_list ()
+## datanode\_decom\_list ()
 
 - Description
 
-Returns a list of the current live NodeManagers.
+    Returns a list of the currently decommissioning DataNodes.
 
 - Return values
 
-Array containing hostnames.
+    Array containing hostnames.
 
-## tasktracker_live_list ()
+## nodemanager\_live\_list ()
 
 - Description
 
-Returns a list of the current live TaskTrackers.
+    Returns a list of the current live NodeManagers.
 
 - Return values
 
-Array containing hostnames.
+    Array containing hostnames.
 
-## tasktracker_blacklist_list ()
+## tasktracker\_live\_list ()
 
 - Description
 
-Returns a list of the current blacklisted TaskTrackers.
+    Returns a list of the current live TaskTrackers.
 
 - Return values
 
-Array containing hostnames.
+    Array containing hostnames.
 
-## tasktracker_live_list ()
+## tasktracker\_blacklist\_list ()
 
 - Description
 
-Returns a list of the current graylisted TaskTrackers.
+    Returns a list of the current blacklisted TaskTrackers.
 
 - Return values
 
-Array containing hostnames.
+    Array containing hostnames.
+
+## tasktracker\_graylist\_list ()
+
+- Description
+
+    Returns a list of the current graylisted TaskTrackers.
+
+- Return values
+
+    Array containing hostnames.
 
 # KNOWN BUGS
 
@@ -147,40 +130,3 @@ https://github.com/cwimmer/hadoop-admin
 Module available on CPAN as Hadoop::Admin:
 
 http://search.cpan.org/~cwimmer/
-
-# AUTHOR
-
-This software is Copyright (c) 2012 by Charles A. Wimmer.
-
-This is free software, licensed under:
-
-    The (three-clause) BSD License
-
-The BSD License
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution. 
-
-    * Neither the name of Charles A. Wimmer nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission. 
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
